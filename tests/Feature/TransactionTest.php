@@ -21,10 +21,10 @@ class TransactionTest extends TestCase
     public function testTransactionSuccess()
     {
         DB::transaction(function () {
-            DB::insert("INSERT INTO categories(id, name, description, timestamp) VALUES (?, ?, ?, ?)", [
+            DB::insert("INSERT INTO categories(id, name, description, created_at) VALUES (?, ?, ?, ?)", [
                 "GADGET", "Gadget", "Gadget Category", "2020-10-10 10:10:10"
             ]);
-            DB::insert("INSERT INTO categories(id, name, description, timestamp) VALUES (?, ?, ?, ?)", [
+            DB::insert("INSERT INTO categories(id, name, description, created_at) VALUES (?, ?, ?, ?)", [
                 "FOOD", "Food", "Food Category", "2020-10-10 10:10:10"
             ]);
         });
@@ -37,10 +37,10 @@ class TransactionTest extends TestCase
     {
         try {
             DB::transaction(function () {
-                DB::insert("INSERT INTO categories(id, name, description, timestamp) VALUES (?, ?, ?, ?)", [
+                DB::insert("INSERT INTO categories(id, name, description, created_at) VALUES (?, ?, ?, ?)", [
                     "GADGET", "Gadget", "Gadget Category", "2020-10-10 10:10:10"
                 ]);
-                DB::insert("INSERT INTO categories(id, name, description, timestamp) VALUES (?, ?, ?, ?)", [
+                DB::insert("INSERT INTO categories(id, name, description, created_at) VALUES (?, ?, ?, ?)", [
                     "GADGET", "Food", "Food Category", "2020-10-10 10:10:10"
                 ]);
             });
@@ -57,10 +57,10 @@ class TransactionTest extends TestCase
     {
         try {
             DB::beginTransaction();
-            DB::insert("INSERT INTO categories(id, name, description, timestamp) VALUES (?, ?, ?, ?)", [
+            DB::insert("INSERT INTO categories(id, name, description, created_at) VALUES (?, ?, ?, ?)", [
                 "GADGET", "Gadget", "Gadget Category", "2020-10-10 10:10:10"
             ]);
-            DB::insert("INSERT INTO categories(id, name, description, timestamp) VALUES (?, ?, ?, ?)", [
+            DB::insert("INSERT INTO categories(id, name, description, created_at) VALUES (?, ?, ?, ?)", [
                 "FOOD", "Food", "Food Category", "2020-10-10 10:10:10"
             ]);
             DB::commit();
@@ -76,10 +76,10 @@ class TransactionTest extends TestCase
     {
         try {
             DB::beginTransaction();
-            DB::insert("INSERT INTO categories(id, name, description, timestamp) VALUES (?, ?, ?, ?)", [
+            DB::insert("INSERT INTO categories(id, name, description, created_at) VALUES (?, ?, ?, ?)", [
                 "GADGET", "Gadget", "Gadget Category", "2020-10-10 10:10:10"
             ]);
-            DB::insert("INSERT INTO categories(id, name, description, timestamp) VALUES (?, ?, ?, ?)", [
+            DB::insert("INSERT INTO categories(id, name, description, created_at) VALUES (?, ?, ?, ?)", [
                 "GADGET", "Food", "Food Category", "2020-10-10 10:10:10"
             ]);
             DB::commit();
