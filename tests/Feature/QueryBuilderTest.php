@@ -19,7 +19,7 @@ class QueryBuilderTest extends TestCase
         DB::delete('DELETE FROM categories');
     }
 
-    public function testInsert()
+    public function testSelectInsert()
     {
         DB::table('categories')->insert([
             'id' => 'GADGET',
@@ -36,7 +36,7 @@ class QueryBuilderTest extends TestCase
 
     public function testSelect()
     {
-        $this->testInsert();
+        $this->testSelectInsert();
 
         $collection = DB::table('categories')->select(['id', 'name'])->get();
         self::assertNotNull($collection);
@@ -46,7 +46,7 @@ class QueryBuilderTest extends TestCase
         });
     }
 
-    public function testQueryBuilderWhere()
+    public function testQueryBuilderWhereInsert()
     {
         DB::table('categories')->insert([
             'id' => 'SMARTPHONE',
@@ -74,7 +74,7 @@ class QueryBuilderTest extends TestCase
 
     public function testWhere()
     {
-        $this->testQueryBuilderWhere();
+        $this->testQueryBuilderWhereInsert();
 
         $collection = DB::table('categories')->orWhere(function (Builder $builder) {
             $builder->where('id', '=', 'SMARTPHONE');
@@ -89,10 +89,11 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereBetween()
     {
-        $this->testQueryBuilderWhere();
+        $this->testQueryBuilderWhereInsert();
 
         $collection = DB::table('categories')->whereBetween('created_at', ['2023-09-24 00:00:00', '2023-09-24 23:59:59'])->get();
         self::assertCount(4, $collection);
+
         $collection->each(function ($item) {
             Log::info(json_encode($item));
         });
@@ -100,9 +101,10 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereIn()
     {
-        $this->testQueryBuilderWhere();
+        $this->testQueryBuilderWhereInsert();
 
         $collection = DB::table('categories')->whereIn('id', ['SMARTPHONE', 'LAPTOP'])->get();
+
         self::assertCount(2, $collection);
         $collection->each(function ($item) {
             Log::info(json_encode($item));
@@ -111,9 +113,10 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereNull()
     {
-        $this->testQueryBuilderWhere();
+        $this->testQueryBuilderWhereInsert();
 
         $collection = DB::table('categories')->whereNull('description')->get();
+
         self::assertCount(4, $collection);
         $collection->each(function ($item) {
             Log::info(json_encode($item));
@@ -122,10 +125,51 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereDate()
     {
-        $this->testQueryBuilderWhere();
+        $this->testQueryBuilderWhereInsert();
 
         $collection = DB::table('categories')->whereDate('created_at', ['2023-09-24'])->get();
+
         self::assertCount(4, $collection);
+        $collection->each(function ($item) {
+            Log::info(json_encode($item));
+        });
+    }
+
+    public function testQueryBuilderUpdate()
+    {
+        $this->testQueryBuilderWhereInsert();
+
+        DB::table('categories')->where('name', '=', 'Smartphone')->update([
+            'name' => 'Handphone'
+        ]);
+
+        $collection = DB::table('categories')->where('name', '=', 'Handphone')->get();
+        self::assertCount(1, $collection);
+    }
+
+    public function testQueryBuilderUpdateOrInsert()
+    {
+        DB::table('categories')->updateOrInsert(
+            [
+                'id' => 'VOUCHER'
+            ],
+            [
+                'name' => 'Voucher',
+                'description' => 'Ticket and Voucher',
+                'created_at' => '2023-09-24 00:00:00'
+            ]
+        );
+
+        $collection = DB::table('categories')->where('id', '=', 'VOUCHER')->get();
+        self::assertCount(1, $collection);
+    }
+
+    public function testQueryBuilderIncrement()
+    {
+        DB::table('counters')->where('id', '=', 'sample')->increment('counter', 1);
+        $collection = DB::table('counters')->where('id', '=', 'sample')->get();
+
+        self::assertCount(1, $collection);
         $collection->each(function ($item) {
             Log::info(json_encode($item));
         });
