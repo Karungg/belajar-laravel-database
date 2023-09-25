@@ -174,4 +174,14 @@ class QueryBuilderTest extends TestCase
             Log::info(json_encode($item));
         });
     }
+
+    public function testQueryBuilderDelete()
+    {
+        $this->testQueryBuilderWhereInsert();
+
+        DB::table('categories')->where('id', '=', 'SMARTPHONE')->delete();
+
+        $collection = DB::table('categories')->where('id', '=', 'SMARTPHONE')->get();
+        self::assertCount(0, $collection);
+    }
 }
