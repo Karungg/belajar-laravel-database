@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Database\Seeders\CategorySeeder;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -46,35 +47,14 @@ class QueryBuilderTest extends TestCase
         });
     }
 
-    public function testQueryBuilderWhereInsert()
+    public function insertCategories()
     {
-        DB::table('categories')->insert([
-            'id' => 'SMARTPHONE',
-            'name' => 'Smartphone',
-            'created_at' => '2023-09-24 00:00:00'
-        ]);
-        DB::table('categories')->insert([
-            'id' => 'FOOD',
-            'name' => 'Food',
-            'created_at' => '2023-09-24 00:00:00'
-        ]);
-        DB::table('categories')->insert([
-            'id' => 'LAPTOP',
-            'name' => 'Laptop',
-            'created_at' => '2023-09-24 00:00:00'
-        ]);
-        DB::table('categories')->insert([
-            'id' => 'FASHION',
-            'name' => 'Fashion',
-            'created_at' => '2023-09-24 00:00:00'
-        ]);
-
-        assertTrue(true);
+        $this->seed(CategorySeeder::class);
     }
 
     public function testWhere()
     {
-        $this->testQueryBuilderWhereInsert();
+        $this->insertCategories();
 
         $collection = DB::table('categories')->orWhere(function (Builder $builder) {
             $builder->where('id', '=', 'SMARTPHONE');
@@ -89,7 +69,7 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereBetween()
     {
-        $this->testQueryBuilderWhereInsert();
+        $this->insertCategories();
 
         $collection = DB::table('categories')->whereBetween('created_at', ['2023-09-24 00:00:00', '2023-09-24 23:59:59'])->get();
         self::assertCount(4, $collection);
@@ -101,7 +81,7 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereIn()
     {
-        $this->testQueryBuilderWhereInsert();
+        $this->insertCategories();
 
         $collection = DB::table('categories')->whereIn('id', ['SMARTPHONE', 'LAPTOP'])->get();
 
@@ -113,7 +93,7 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereNull()
     {
-        $this->testQueryBuilderWhereInsert();
+        $this->insertCategories();
 
         $collection = DB::table('categories')->whereNull('description')->get();
 
@@ -125,7 +105,7 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereDate()
     {
-        $this->testQueryBuilderWhereInsert();
+        $this->insertCategories();
 
         $collection = DB::table('categories')->whereDate('created_at', ['2023-09-24'])->get();
 
@@ -137,7 +117,7 @@ class QueryBuilderTest extends TestCase
 
     public function testQueryBuilderUpdate()
     {
-        $this->testQueryBuilderWhereInsert();
+        $this->insertCategories();
 
         DB::table('categories')->where('name', '=', 'Smartphone')->update([
             'name' => 'Handphone'
@@ -177,11 +157,44 @@ class QueryBuilderTest extends TestCase
 
     public function testQueryBuilderDelete()
     {
-        $this->testQueryBuilderWhereInsert();
+        $this->insertCategories();
 
         DB::table('categories')->where('id', '=', 'SMARTPHONE')->delete();
 
         $collection = DB::table('categories')->where('id', '=', 'SMARTPHONE')->get();
         self::assertCount(0, $collection);
+    }
+
+    public function insertProducts()
+    {
+        $this->insertCategories();
+
+        DB::table('products')->insert([
+            "id" => "1",
+            "name" => "Iphone 15 Pro Max",
+            "category_id" => "SMARTPHONE",
+            "price" => 20000000
+        ]);
+        DB::table('products')->insert([
+            "id" => "2",
+            "name" => "Samsung Galaxy S23 Ultra",
+            "category_id" => "SMARTPHONE",
+            "price" => 20000000
+        ]);
+    }
+
+    public function testQueryBuilderJoin()
+    {
+        $this->insertProducts();
+
+        $collection = DB::table('products')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->select('products.id', 'products.name', 'products.price', 'categories.name as category_name')
+            ->get();
+
+        self::assertCount(2, $collection);
+        $collection->each(function ($item) {
+            Log::info(json_encode($item));
+        });
     }
 }
