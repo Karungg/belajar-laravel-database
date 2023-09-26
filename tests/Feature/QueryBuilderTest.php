@@ -18,6 +18,7 @@ class QueryBuilderTest extends TestCase
     {
         parent::setUp();
         DB::delete('DELETE FROM categories');
+        DB::delete('DELETE FROM products');
     }
 
     public function testSelectInsert()
@@ -173,7 +174,7 @@ class QueryBuilderTest extends TestCase
             "id" => "1",
             "name" => "Iphone 15 Pro Max",
             "category_id" => "SMARTPHONE",
-            "price" => 20000000
+            "price" => 10000000
         ]);
         DB::table('products')->insert([
             "id" => "2",
@@ -190,6 +191,21 @@ class QueryBuilderTest extends TestCase
         $collection = DB::table('products')
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->select('products.id', 'products.name', 'products.price', 'categories.name as category_name')
+            ->get();
+
+        self::assertCount(2, $collection);
+        $collection->each(function ($item) {
+            Log::info(json_encode($item));
+        });
+    }
+
+    public function testQueryBuilderOrderBy()
+    {
+        $this->insertProducts();
+
+        $collection = DB::table('products')
+            ->orderBy('price', 'desc')
+            ->orderBy('name', 'asc')
             ->get();
 
         self::assertCount(2, $collection);
