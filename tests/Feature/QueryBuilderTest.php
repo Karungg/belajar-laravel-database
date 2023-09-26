@@ -214,6 +214,16 @@ class QueryBuilderTest extends TestCase
         });
     }
 
+    public function insertManyCategories()
+    {
+        for ($i = 0; $i < 100; $i++) {
+            DB::table('categories')->insert([
+                "id" => "Category-$i",
+                "name" => "Category $i"
+            ]);
+        }
+    }
+
     public function testQueryBuilderPaging()
     {
         $this->insertProducts();
@@ -241,5 +251,17 @@ class QueryBuilderTest extends TestCase
                     Log::info(json_encode($item));
                 });
             });
+    }
+
+    public function testQueryBuilderLazy()
+    {
+        $this->insertManyCategories();
+
+        $collection = DB::table('categories')->orderBy('id')->lazy(10)->take(3);
+        self::assertNotNull($collection);
+
+        $collection->each(function ($item) {
+            Log::info(json_encode($item));
+        });
     }
 }
