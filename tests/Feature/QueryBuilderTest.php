@@ -228,4 +228,18 @@ class QueryBuilderTest extends TestCase
             Log::info(json_encode($item));
         });
     }
+
+    public function testQueryBuilderChunk()
+    {
+        $this->insertProducts();
+
+        DB::table('categories')
+            ->orderBy('id')
+            ->chunk(1, function ($categories) {
+                self::assertNotNull($categories);
+                $categories->each(function ($item) {
+                    Log::info(json_encode($item));
+                });
+            });
+    }
 }
