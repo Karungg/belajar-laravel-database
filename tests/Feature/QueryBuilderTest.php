@@ -416,4 +416,25 @@ class QueryBuilderTest extends TestCase
             }
         }
     }
+
+    public function testQueryBuilderCursorPagination()
+    {
+        $this->insertProducts();
+        $this->insertProductFood();
+
+        $cursor = "id";
+        while (true) {
+            $paginate = DB::table('products')->orderBy('id')->cursorPaginate(2, cursor: $cursor);
+
+            foreach ($paginate->items() as $item) {
+                self::assertNotNull($item);
+                Log::info(json_encode($item));
+            }
+
+            $cursor = $paginate->nextCursor();
+            if ($cursor == null) {
+                break;
+            }
+        }
+    }
 }
