@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string("category_id", 100)->nullable(false);
             $table->timestamp("created_at")->nullable(false)->useCurrent();
 
-            $table->foreign("category_id")->references("id")->on("categories");
+            $table->foreign("category_id")->references("id")->on("categories")->onDelete('cascade');
         });
     }
 

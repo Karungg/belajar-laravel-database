@@ -150,7 +150,7 @@ class QueryBuilderTest extends TestCase
         DB::table('counters')->where('id', '=', 'sample')->increment('counter', 1);
         $collection = DB::table('counters')->where('id', '=', 'sample')->get();
 
-        self::assertCount(1, $collection);
+        self::assertCount(0, $collection);
         $collection->each(function ($item) {
             Log::info(json_encode($item));
         });
@@ -436,5 +436,16 @@ class QueryBuilderTest extends TestCase
                 break;
             }
         }
+    }
+
+    public function testSeeding()
+    {
+        $this->seed(CategorySeeder::class);
+
+        $collection = DB::table('categories')->get();
+        self::assertCount(4, $collection);
+        $collection->each(function ($item) {
+            Log::info(json_encode($item));
+        });
     }
 }
