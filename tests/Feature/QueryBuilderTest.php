@@ -377,4 +377,23 @@ class QueryBuilderTest extends TestCase
             self::assertCount(1, $collection);
         });
     }
+
+    public function testPagination()
+    {
+        $this->insertProducts();
+        $this->insertProductFood();
+
+        $paginate = DB::table('products')->paginate(2);
+
+        self::assertEquals(1, $paginate->currentPage());
+        self::assertEquals(2, $paginate->perPage());
+        self::assertEquals(2, $paginate->lastPage());
+        self::assertEquals(4, $paginate->total());
+
+        $collection = $paginate->items();
+        self::assertCount(2, $collection);
+        foreach ($collection as $item) {
+            Log::info(json_encode($item));
+        }
+    }
 }
