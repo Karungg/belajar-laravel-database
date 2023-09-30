@@ -396,4 +396,24 @@ class QueryBuilderTest extends TestCase
             Log::info(json_encode($item));
         }
     }
+
+    public function testIterateAllPagination()
+    {
+        $this->insertProducts();
+        $this->insertProductFood();
+
+        $page = 1;
+        while (true) {
+            $paginate = DB::table('products')->paginate(2, page: $page);
+            if ($paginate->isEmpty()) {
+                break;
+            } else {
+                $page++;
+                foreach ($paginate->items() as $item) {
+                    self::assertNotNull($item);
+                    Log::info(json_encode($item));
+                }
+            }
+        }
+    }
 }
